@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Graphita\\Graphita\\": "src/"
+            "Graphita\\Mathematics\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Graphita\\Graphita\\Tests\\": "tests/"
+            "Graphita\\Mathematics\\Tests\\": "tests/"
         }
     },
     "authors": [
