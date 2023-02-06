@@ -99,4 +99,23 @@ class BaseConvertTest extends TestCase
 
         $this->assertEquals('0123456789abcdef', $converter->getDestinationCharacters());
     }
+
+    public function testGetEmptyResult()
+    {
+        $converter = new BaseConvert;
+
+        $this->assertIsArray($converter->getResultArray());
+        $this->assertEmpty($converter->getResultArray());
+        $this->assertEmpty($converter->getResult());
+    }
+
+    public function testCalculateAndGetResult()
+    {
+        $converter = BaseConvert::convert(20)->to(4)->calculate();
+
+        $this->assertIsArray($converter->getResultArray());
+        $this->assertCount(3, $converter->getResultArray());
+        $this->assertEquals([1,1,0], $converter->getResultArray());
+        $this->assertEquals('110', $converter->getResult());
+    }
 }

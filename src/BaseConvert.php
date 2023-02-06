@@ -105,14 +105,6 @@ class BaseConvert
     }
 
     /**
-     * @return $this
-     */
-    public function calculate()
-    {
-        return $this;
-    }
-
-    /**
      * @return int|null
      */
     public function getSourceNumber(): ?int
@@ -152,6 +144,24 @@ class BaseConvert
         return $this->destinationCharacters;
     }
 
+    private function getDigit($character, $characters = null)
+    {
+        if (!empty($characters)) {
+            $charactersArray = str_split($characters);
+            return array_search($character, $charactersArray);
+        }
+        return $character;
+    }
+
+    private function getCharacter($digit, $characters = null)
+    {
+        if (!empty($characters)) {
+            $charactersArray = str_split($characters);
+            return $charactersArray[$digit];
+        }
+        return $digit;
+    }
+
     /**
      * @return array
      */
@@ -166,5 +176,30 @@ class BaseConvert
     public function getResult(): string
     {
         return implode('', $this->resultArray);
+    }
+
+    /**
+     * @return $this
+     */
+    public function calculate()
+    {
+        $sourceArray = array_reverse(str_split($this->getSourceNumber()));
+        $sourceNumber = 0;
+        foreach ($sourceArray as $sourceIndex => $sourceDigit) {
+            $sourceNumber += $this->getDigit($sourceDigit, $this->getSourceCharacters()) * pow($this->getSourceBase(), $sourceIndex);
+        }
+
+        $resultArray = [];
+        while ($sourceNumber >= $this->getDestinationBase()) {
+            $resultDigit = $sourceNumber % $this->getDestinationBase();
+            $resultArray[] = $this->getCharacter($resultDigit, $this->getDestinationCharacters());
+
+            $sourceNumber = floor($sourceNumber / $this->getDestinationBase());
+        }
+        $resultArray[] = $this->getCharacter($sourceNumber, $this->getDestinationCharacters());
+
+        $this->resultArray = array_reverse($resultArray);
+
+        return $this;
     }
 }
