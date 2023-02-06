@@ -9,10 +9,16 @@ class BaseConvert
      */
     const DEFAULT_BASE = 10;
 
+
     /**
-     * @var int|null
+     * @var int|string|null
      */
-    private ?int $sourceNumber = null;
+    private int|string|null $sourceNumber = null;
+
+    /**
+     * @var array
+     */
+    private array $sourceNumberArray = [];
 
     /**
      * @var int
@@ -40,25 +46,31 @@ class BaseConvert
     private array $resultArray = [];
 
     /**
-     * @param int $sourceNumber
+     * @var int|string|null
+     */
+    private int|string|null $result = null;
+
+    /**
+     * @param int|string $sourceNumber
      * @param int $sourceBase
      * @param string|null $sourceCharacters
      * @return BaseConvert
      */
-    public static function convert(int $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null)
+    public static function convert(int|string $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null): BaseConvert
     {
         return (new static())->from($sourceNumber, $sourceBase, $sourceCharacters);
     }
 
     /**
-     * @param int $sourceNumber
+     * @param int|string $sourceNumber
      * @param int $sourceBase
      * @param string|null $sourceCharacters
      * @return $this
      */
-    public function from(int $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null)
+    public function from(int|string $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null): static
     {
         $this->sourceNumber = $sourceNumber;
+        $this->sourceNumberArray = str_split($sourceNumber);
         $this->sourceBase = $sourceBase;
         if ($sourceCharacters) {
             $this->sourceCharacters = $sourceCharacters;
@@ -70,7 +82,7 @@ class BaseConvert
      * @param string|null $sourceCharacters
      * @return $this
      */
-    public function fromCharacters(string $sourceCharacters = null)
+    public function fromCharacters(string $sourceCharacters = null): static
     {
         if ($sourceCharacters) {
             $this->sourceCharacters = $sourceCharacters;
@@ -83,7 +95,7 @@ class BaseConvert
      * @param string|null $destinationCharacters
      * @return $this
      */
-    public function to(int $destinationBase, string $destinationCharacters = null)
+    public function to(int $destinationBase, string $destinationCharacters = null): static
     {
         $this->destinationBase = $destinationBase;
         if ($destinationCharacters) {
@@ -96,7 +108,7 @@ class BaseConvert
      * @param string|null $destinationCharacters
      * @return $this
      */
-    public function toCharacters(string $destinationCharacters = null)
+    public function toCharacters(string $destinationCharacters = null): static
     {
         if ($destinationCharacters) {
             $this->destinationCharacters = $destinationCharacters;
@@ -105,11 +117,19 @@ class BaseConvert
     }
 
     /**
-     * @return int|null
+     * @return int|string|null
      */
-    public function getSourceNumber(): ?int
+    public function getSourceNumber(): int|string|null
     {
         return $this->sourceNumber;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSourceNumberArray(): array
+    {
+        return $this->sourceNumberArray;
     }
 
     /**
@@ -144,20 +164,30 @@ class BaseConvert
         return $this->destinationCharacters;
     }
 
-    private function getDigit($character, $characters = null)
+    /**
+     * @param int|string $character
+     * @param string|null $characters
+     * @return false|int|string|null
+     */
+    private function getDigit(int|string $character, string $characters = null): false|int|string|null
     {
         if (!empty($characters)) {
             $charactersArray = str_split($characters);
-            return array_search($character, $charactersArray);
+            return array_search($character, $charactersArray) ?? null;
         }
         return $character;
     }
 
-    private function getCharacter($digit, $characters = null)
+    /**
+     * @param int $digit
+     * @param string|null $characters
+     * @return mixed
+     */
+    private function getCharacter(int $digit, string $characters = null): mixed
     {
         if (!empty($characters)) {
             $charactersArray = str_split($characters);
-            return $charactersArray[$digit];
+            return $charactersArray[$digit] ?? null;
         }
         return $digit;
     }
@@ -171,19 +201,19 @@ class BaseConvert
     }
 
     /**
-     * @return string
+     * @return int|string|null
      */
-    public function getResult(): string
+    public function getResult(): int|string|null
     {
-        return implode('', $this->resultArray);
+        return $this->result;
     }
 
     /**
      * @return $this
      */
-    public function calculate()
+    public function calculate(): static
     {
-        $sourceArray = array_reverse(str_split($this->getSourceNumber()));
+        $sourceArray = array_reverse($this->getSourceNumberArray());
         $sourceNumber = 0;
         foreach ($sourceArray as $sourceIndex => $sourceDigit) {
             $sourceNumber += $this->getDigit($sourceDigit, $this->getSourceCharacters()) * pow($this->getSourceBase(), $sourceIndex);
@@ -199,6 +229,7 @@ class BaseConvert
         $resultArray[] = $this->getCharacter($sourceNumber, $this->getDestinationCharacters());
 
         $this->resultArray = array_reverse($resultArray);
+        $this->result = implode('', $this->resultArray);
 
         return $this;
     }
