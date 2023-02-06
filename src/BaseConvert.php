@@ -5,6 +5,11 @@ namespace Graphita\Mathematics;
 class BaseConvert
 {
     /**
+     * Default Base for Source & Destination Base
+     */
+    const DEFAULT_BASE = 10;
+
+    /**
      * @var int|null
      */
     private ?int $sourceNumber = null;
@@ -12,12 +17,12 @@ class BaseConvert
     /**
      * @var int
      */
-    private int $sourceBase = 10;
+    private int $sourceBase = self::DEFAULT_BASE;
 
     /**
      * @var int
      */
-    private int $destinationBase = 10;
+    private int $destinationBase = self::DEFAULT_BASE;
 
     /**
      * @var ?string
@@ -35,77 +40,74 @@ class BaseConvert
     private array $resultArray = [];
 
     /**
-     * @param $sourceNumber
+     * @param int $sourceNumber
+     * @param int $sourceBase
+     * @param string|null $sourceCharacters
+     * @return BaseConvert
      */
-    public function __construct($sourceNumber = null)
+    public static function convert(int $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null)
     {
-        $this->from($sourceNumber);
-    }
-
-    /**
-     * @param $method
-     * @param $parameters
-     * @return mixed
-     */
-    public static function __callStatic($method, $parameters)
-    {
-        return (new static)->$method(...$parameters);
+        return (new static())->from($sourceNumber, $sourceBase, $sourceCharacters);
     }
 
     /**
      * @param int $sourceNumber
+     * @param int $sourceBase
+     * @param string|null $sourceCharacters
      * @return $this
      */
-    public function from(int $sourceNumber): static
+    public function from(int $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null)
     {
         $this->sourceNumber = $sourceNumber;
-        return $this;
-    }
-
-    /**
-     * @param int $sourceBase
-     * @return $this
-     */
-    public function fromBase(int $sourceBase): static
-    {
         $this->sourceBase = $sourceBase;
+        if ($sourceCharacters) {
+            $this->sourceCharacters = $sourceCharacters;
+        }
         return $this;
     }
 
     /**
-     * @param string $sourceCharacters
+     * @param string|null $sourceCharacters
      * @return $this
      */
-    public function fromCharacters(string $sourceCharacters): static
+    public function fromCharacters(string $sourceCharacters = null)
     {
-        $this->sourceCharacters = $sourceCharacters;
+        if ($sourceCharacters) {
+            $this->sourceCharacters = $sourceCharacters;
+        }
         return $this;
     }
 
     /**
      * @param int $destinationBase
+     * @param string|null $destinationCharacters
      * @return $this
      */
-    public function toBase(int $destinationBase): static
+    public function to(int $destinationBase, string $destinationCharacters = null)
     {
         $this->destinationBase = $destinationBase;
+        if ($destinationCharacters) {
+            $this->destinationCharacters = $destinationCharacters;
+        }
         return $this;
     }
 
     /**
-     * @param string $destinationCharacters
+     * @param string|null $destinationCharacters
      * @return $this
      */
-    public function toCharacters(string $destinationCharacters): static
+    public function toCharacters(string $destinationCharacters = null)
     {
-        $this->destinationCharacters = $destinationCharacters;
+        if ($destinationCharacters) {
+            $this->destinationCharacters = $destinationCharacters;
+        }
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function calculate(): static
+    public function calculate()
     {
         return $this;
     }
@@ -127,19 +129,19 @@ class BaseConvert
     }
 
     /**
-     * @return int
-     */
-    public function getDestinationBase(): int
-    {
-        return $this->destinationBase;
-    }
-
-    /**
      * @return string|null
      */
     public function getSourceCharacters(): ?string
     {
         return $this->sourceCharacters;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDestinationBase(): int
+    {
+        return $this->destinationBase;
     }
 
     /**
