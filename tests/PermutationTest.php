@@ -91,7 +91,7 @@ class PermutationTest extends TestCase
     {
         $permutation = new Permutation();
         $permutation->setItems([1, 2, 3]);
-        $permutation->setSelection(5);
+        $permutation->setSelection(2);
         $permutation->setRepetitions(true);
         $permutation->calculate();
 
