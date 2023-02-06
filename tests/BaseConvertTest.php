@@ -119,6 +119,16 @@ class BaseConvertTest extends TestCase
         $this->assertEquals('110', $converter->getResult());
     }
 
+    public function testCalculateAndGetResultWithMinimumDigits()
+    {
+        $converter = BaseConvert::convert(20)->to(4)->setMinDigits(5)->calculate();
+
+        $this->assertIsArray($converter->getResultArray());
+        $this->assertCount(5, $converter->getResultArray());
+        $this->assertEquals([0,0,1,1,0], $converter->getResultArray());
+        $this->assertEquals('00110', $converter->getResult());
+    }
+
     public function testCalculateAndGetResultFromCharacters()
     {
         $converter = BaseConvert::convert('FF', 16, '0123456789ABCDEF')->to(10)->calculate();

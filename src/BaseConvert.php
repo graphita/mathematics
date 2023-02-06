@@ -51,6 +51,11 @@ class BaseConvert
     private int|string|null $result = null;
 
     /**
+     * @var int|null
+     */
+    private int|null $minDigits = null;
+
+    /**
      * @param int|string $sourceNumber
      * @param int $sourceBase
      * @param string|null $sourceCharacters
@@ -193,6 +198,24 @@ class BaseConvert
     }
 
     /**
+     * @return int|null
+     */
+    public function getMinDigits(): ?int
+    {
+        return $this->minDigits;
+    }
+
+    /**
+     * @param int $minDigits
+     * @return BaseConvert
+     */
+    public function setMinDigits(int $minDigits): static
+    {
+        $this->minDigits = $minDigits;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getResultArray(): array
@@ -227,6 +250,12 @@ class BaseConvert
             $sourceNumber = floor($sourceNumber / $this->getDestinationBase());
         }
         $resultArray[] = $this->getCharacter($sourceNumber, $this->getDestinationCharacters());
+
+        if( $this->getMinDigits() ){
+            while( count($resultArray) < $this->getMinDigits() ){
+                $resultArray[] = $this->getCharacter(0, $this->getDestinationCharacters());
+            }
+        }
 
         $this->resultArray = array_reverse($resultArray);
         $this->result = implode('', $this->resultArray);
