@@ -51,11 +51,20 @@ class Permutation
     }
 
     /**
+     * @param $itemIndex
+     * @return mixed|null
+     */
+    public function getItem($itemIndex): mixed
+    {
+        return $this->items[$itemIndex] ?? null;
+    }
+
+    /**
      * @return int
      */
     public function countItems(): int
     {
-        return count( $this->getItems() );
+        return count($this->getItems());
     }
 
     /**
@@ -99,7 +108,7 @@ class Permutation
      */
     public function countPossibilities(): int
     {
-        return count( $this->getPossibilities() );
+        return count($this->getPossibilities());
     }
 
     /**
@@ -108,7 +117,20 @@ class Permutation
     public function calculate(): static
     {
         $this->possibilities = [];
-
+        if ($this->countItems()) {
+            $totalPossibilities = pow($this->countItems(), $this->getSelection());
+            for ($possibilityId = 0; $possibilityId < $totalPossibilities; $possibilityId++) {
+                $itemIndexes = BaseConvert::convert($possibilityId)->to($this->countItems())->setMinDigits($this->getSelection())->calculate()->getResultArray();
+                if (!$this->canRepetitions() && count($itemIndexes) !== count(array_unique($itemIndexes))) {
+                    continue;
+                }
+                $possibility = [];
+                foreach ($itemIndexes as $itemIndex) {
+                    $possibility[] = $this->getItem($itemIndex);
+                }
+                $this->possibilities[] = $possibility;
+            }
+        }
         return $this;
     }
 }
