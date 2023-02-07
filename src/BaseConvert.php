@@ -41,11 +41,6 @@ class BaseConvert
     private array $resultArray = [];
 
     /**
-     * @var int|string|null
-     */
-    private int|string|null $result = null;
-
-    /**
      * @var int|null
      */
     private int|null $minDigits = null;
@@ -212,7 +207,9 @@ class BaseConvert
      */
     public function getResult(): int|string|null
     {
-        return $this->result;
+        if( count( $this->getResultArray() ) )
+            return implode('', $this->getResultArray());
+        return null;
     }
 
     /**
@@ -220,16 +217,22 @@ class BaseConvert
      */
     public function calculate(): static
     {
-        $sourceArray = array_reverse(str_split($this->getSourceNumber()));
-        $sourceNumber = 0;
-        foreach ($sourceArray as $sourceIndex => $sourceDigit) {
-            $sourceNumber += $this->getDigit($sourceDigit, $this->getSourceCharactersMap()) * pow($this->getSourceBase(), $sourceIndex);
+        $sourceNumber = $this->getSourceNumber();
+        if (count($this->getSourceCharactersMap())) {
+            $sourceArray = array_reverse(str_split($this->getSourceNumber()));
+            $sourceNumber = 0;
+            foreach ($sourceArray as $sourceIndex => $sourceDigit) {
+                $sourceNumber += $this->getDigit($sourceDigit, $this->getSourceCharactersMap()) * pow($this->getSourceBase(), $sourceIndex);
+            }
         }
 
         $resultArray = [];
         while ($sourceNumber >= $this->getDestinationBase()) {
             $resultDigit = $sourceNumber % $this->getDestinationBase();
-            $resultArray[] = $this->getCharacter($resultDigit, $this->getDestinationCharactersMap());
+            if (count($this->getDestinationCharactersMap())) {
+                $resultDigit = $this->getCharacter($resultDigit, $this->getDestinationCharactersMap());
+            }
+            $resultArray[] = $resultDigit;
 
             $sourceNumber = floor($sourceNumber / $this->getDestinationBase());
         }
@@ -242,7 +245,6 @@ class BaseConvert
         }
 
         $this->resultArray = array_reverse($resultArray);
-        $this->result = implode('', $this->resultArray);
 
         return $this;
     }
