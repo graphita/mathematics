@@ -16,11 +16,6 @@ class BaseConvert
     private int|string|null $sourceNumber = null;
 
     /**
-     * @var array
-     */
-    private array $sourceNumberArray = [];
-
-    /**
      * @var int
      */
     private int $sourceBase = self::DEFAULT_BASE;
@@ -31,14 +26,14 @@ class BaseConvert
     private int $destinationBase = self::DEFAULT_BASE;
 
     /**
-     * @var ?string
+     * @var array
      */
-    private ?string $sourceCharacters = null;
+    private array $sourceCharactersMap = [];
 
     /**
-     * @var ?string
+     * @var array
      */
-    private ?string $destinationCharacters = null;
+    private array $destinationCharactersMap = [];
 
     /**
      * @var array
@@ -58,65 +53,64 @@ class BaseConvert
     /**
      * @param int|string $sourceNumber
      * @param int $sourceBase
-     * @param string|null $sourceCharacters
+     * @param array|string $sourceCharactersMap
      * @return BaseConvert
      */
-    public static function convert(int|string $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null): BaseConvert
+    public static function convert(int|string $sourceNumber, int $sourceBase = self::DEFAULT_BASE, array|string $sourceCharactersMap = []): BaseConvert
     {
-        return (new static())->from($sourceNumber, $sourceBase, $sourceCharacters);
+        return (new static())->from($sourceNumber, $sourceBase, $sourceCharactersMap);
     }
 
     /**
      * @param int|string $sourceNumber
      * @param int $sourceBase
-     * @param string|null $sourceCharacters
+     * @param array|string $sourceCharactersMap
      * @return $this
      */
-    public function from(int|string $sourceNumber, int $sourceBase = self::DEFAULT_BASE, string $sourceCharacters = null): static
+    public function from(int|string $sourceNumber, int $sourceBase = self::DEFAULT_BASE, array|string $sourceCharactersMap = []): static
     {
         $this->sourceNumber = $sourceNumber;
-        $this->sourceNumberArray = str_split($sourceNumber);
         $this->sourceBase = $sourceBase;
-        if ($sourceCharacters) {
-            $this->sourceCharacters = $sourceCharacters;
-        }
+        $this->fromCharacters($sourceCharactersMap);
         return $this;
     }
 
     /**
-     * @param string|null $sourceCharacters
+     * @param array|string $sourceCharactersMap
      * @return $this
      */
-    public function fromCharacters(string $sourceCharacters = null): static
+    public function fromCharacters(array|string $sourceCharactersMap = []): static
     {
-        if ($sourceCharacters) {
-            $this->sourceCharacters = $sourceCharacters;
+        if (is_string($sourceCharactersMap)) {
+            $this->sourceCharactersMap = str_split($sourceCharactersMap);
+        } else {
+            $this->sourceCharactersMap = $sourceCharactersMap;
         }
         return $this;
     }
 
     /**
      * @param int $destinationBase
-     * @param string|null $destinationCharacters
+     * @param array|string $destinationCharactersMap
      * @return $this
      */
-    public function to(int $destinationBase, string $destinationCharacters = null): static
+    public function to(int $destinationBase, array|string $destinationCharactersMap = []): static
     {
         $this->destinationBase = $destinationBase;
-        if ($destinationCharacters) {
-            $this->destinationCharacters = $destinationCharacters;
-        }
+        $this->toCharacters($destinationCharactersMap);
         return $this;
     }
 
     /**
-     * @param string|null $destinationCharacters
+     * @param array|string $destinationCharactersMap
      * @return $this
      */
-    public function toCharacters(string $destinationCharacters = null): static
+    public function toCharacters(array|string $destinationCharactersMap = []): static
     {
-        if ($destinationCharacters) {
-            $this->destinationCharacters = $destinationCharacters;
+        if (is_string($destinationCharactersMap)) {
+            $this->destinationCharactersMap = str_split($destinationCharactersMap);
+        } else {
+            $this->destinationCharactersMap = $destinationCharactersMap;
         }
         return $this;
     }
@@ -130,14 +124,6 @@ class BaseConvert
     }
 
     /**
-     * @return array
-     */
-    public function getSourceNumberArray(): array
-    {
-        return $this->sourceNumberArray;
-    }
-
-    /**
      * @return int
      */
     public function getSourceBase(): int
@@ -146,11 +132,11 @@ class BaseConvert
     }
 
     /**
-     * @return string|null
+     * @return array
      */
-    public function getSourceCharacters(): ?string
+    public function getSourceCharactersMap(): array
     {
-        return $this->sourceCharacters;
+        return $this->sourceCharactersMap;
     }
 
     /**
@@ -162,37 +148,35 @@ class BaseConvert
     }
 
     /**
-     * @return string|null
+     * @return array
      */
-    public function getDestinationCharacters(): ?string
+    public function getDestinationCharactersMap(): array
     {
-        return $this->destinationCharacters;
+        return $this->destinationCharactersMap;
     }
 
     /**
      * @param int|string $character
-     * @param string|null $characters
+     * @param array $characters
      * @return false|int|string|null
      */
-    private function getDigit(int|string $character, string $characters = null): false|int|string|null
+    private function getDigit(int|string $character, array $characters = []): false|int|string|null
     {
-        if (!empty($characters)) {
-            $charactersArray = str_split($characters);
-            return array_search($character, $charactersArray) ?? null;
+        if (count($characters)) {
+            return array_search($character, $characters) ?? null;
         }
         return $character;
     }
 
     /**
      * @param int $digit
-     * @param string|null $characters
+     * @param array $characters
      * @return mixed
      */
-    private function getCharacter(int $digit, string $characters = null): mixed
+    private function getCharacter(int $digit, array $characters = []): mixed
     {
-        if (!empty($characters)) {
-            $charactersArray = str_split($characters);
-            return $charactersArray[$digit] ?? null;
+        if (count($characters)) {
+            return $characters[$digit] ?? null;
         }
         return $digit;
     }
@@ -236,24 +220,24 @@ class BaseConvert
      */
     public function calculate(): static
     {
-        $sourceArray = array_reverse($this->getSourceNumberArray());
+        $sourceArray = array_reverse(str_split($this->getSourceNumber()));
         $sourceNumber = 0;
         foreach ($sourceArray as $sourceIndex => $sourceDigit) {
-            $sourceNumber += $this->getDigit($sourceDigit, $this->getSourceCharacters()) * pow($this->getSourceBase(), $sourceIndex);
+            $sourceNumber += $this->getDigit($sourceDigit, $this->getSourceCharactersMap()) * pow($this->getSourceBase(), $sourceIndex);
         }
 
         $resultArray = [];
         while ($sourceNumber >= $this->getDestinationBase()) {
             $resultDigit = $sourceNumber % $this->getDestinationBase();
-            $resultArray[] = $this->getCharacter($resultDigit, $this->getDestinationCharacters());
+            $resultArray[] = $this->getCharacter($resultDigit, $this->getDestinationCharactersMap());
 
             $sourceNumber = floor($sourceNumber / $this->getDestinationBase());
         }
-        $resultArray[] = $this->getCharacter($sourceNumber, $this->getDestinationCharacters());
+        $resultArray[] = $this->getCharacter($sourceNumber, $this->getDestinationCharactersMap());
 
-        if( $this->getMinDigits() ){
-            while( count($resultArray) < $this->getMinDigits() ){
-                $resultArray[] = $this->getCharacter(0, $this->getDestinationCharacters());
+        if ($this->getMinDigits()) {
+            while (count($resultArray) < $this->getMinDigits()) {
+                $resultArray[] = $this->getCharacter(0, $this->getDestinationCharactersMap());
             }
         }
 

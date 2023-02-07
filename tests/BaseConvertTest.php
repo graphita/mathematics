@@ -13,9 +13,10 @@ class BaseConvertTest extends TestCase
 
         $this->assertEquals(10, $converter->getSourceBase());
         $this->assertEquals(10, $converter->getDestinationBase());
-        $this->assertNull($converter->getSourceCharacters());
-        $this->assertNull($converter->getDestinationCharacters());
+        $this->assertEmpty($converter->getSourceCharactersMap());
+        $this->assertEmpty($converter->getDestinationCharactersMap());
     }
+
     public function testSetAndGetSourceNumber()
     {
         $converter = BaseConvert::convert(20);
@@ -33,14 +34,16 @@ class BaseConvertTest extends TestCase
         $this->assertEquals(16, $converter->getSourceBase());
     }
 
-    public function testSetAndGetSourceNumberAndSourceBaseAndSourceCharacters()
+    public function testSetAndGetSourceNumberAndSourceBaseAndSourceCharactersMap()
     {
         $converter = BaseConvert::convert(20, 16, '0123456789abcdef');
 
         $this->assertInstanceOf(BaseConvert::class, $converter);
         $this->assertEquals(20, $converter->getSourceNumber());
         $this->assertEquals(16, $converter->getSourceBase());
-        $this->assertEquals('0123456789abcdef', $converter->getSourceCharacters());
+        $this->assertIsArray($converter->getSourceCharactersMap());
+        $this->assertCount(16, $converter->getSourceCharactersMap());
+        $this->assertEquals('0123456789abcdef', implode('', $converter->getSourceCharactersMap()));
     }
 
     public function testSetAndGetSourceNumberWithFrom()
@@ -58,21 +61,25 @@ class BaseConvertTest extends TestCase
         $this->assertEquals(16, $converter->getSourceBase());
     }
 
-    public function testSetAndGetSourceNumberAndSourceBaseAndSourceCharactersWithFrom()
+    public function testSetAndGetSourceNumberAndSourceBaseAndSourceCharactersMapWithFrom()
     {
         $converter = new BaseConvert();
         $converter->from(20, 16, '0123456789abcdef');
         $this->assertEquals(20, $converter->getSourceNumber());
         $this->assertEquals(16, $converter->getSourceBase());
-        $this->assertEquals('0123456789abcdef', $converter->getSourceCharacters());
+        $this->assertIsArray($converter->getSourceCharactersMap());
+        $this->assertCount(16, $converter->getSourceCharactersMap());
+        $this->assertEquals('0123456789abcdef', implode('', $converter->getSourceCharactersMap()));
     }
 
-    public function testSetAndGetSourceCharacters()
+    public function testSetAndGetSourceCharactersMap()
     {
         $converter = new BaseConvert();
         $converter->fromCharacters('0123456789abcdef');
 
-        $this->assertEquals('0123456789abcdef', $converter->getSourceCharacters());
+        $this->assertIsArray($converter->getSourceCharactersMap());
+        $this->assertCount(16, $converter->getSourceCharactersMap());
+        $this->assertEquals('0123456789abcdef', implode('', $converter->getSourceCharactersMap()));
     }
 
     public function testSetAndGetDestinationBase()
@@ -83,21 +90,25 @@ class BaseConvertTest extends TestCase
         $this->assertEquals(16, $converter->getDestinationBase());
     }
 
-    public function testSetAndGetDestinationBaseAndDestinationCharacters()
+    public function testSetAndGetDestinationBaseAndDestinationCharactersMap()
     {
         $converter = BaseConvert::convert(20);
         $converter->to(16, '0123456789abcdef');
 
         $this->assertEquals(16, $converter->getDestinationBase());
-        $this->assertEquals('0123456789abcdef', $converter->getDestinationCharacters());
+        $this->assertIsArray($converter->getDestinationCharactersMap());
+        $this->assertCount(16, $converter->getDestinationCharactersMap());
+        $this->assertEquals('0123456789abcdef', implode('', $converter->getDestinationCharactersMap()));
     }
 
-    public function testSetAndGetDestinationCharacters()
+    public function testSetAndGetDestinationCharactersMap()
     {
         $converter = new BaseConvert();
         $converter->toCharacters('0123456789abcdef');
 
-        $this->assertEquals('0123456789abcdef', $converter->getDestinationCharacters());
+        $this->assertIsArray($converter->getDestinationCharactersMap());
+        $this->assertCount(16, $converter->getDestinationCharactersMap());
+        $this->assertEquals('0123456789abcdef', implode('', $converter->getDestinationCharactersMap()));
     }
 
     public function testGetEmptyResult()
@@ -115,7 +126,7 @@ class BaseConvertTest extends TestCase
 
         $this->assertIsArray($converter->getResultArray());
         $this->assertCount(3, $converter->getResultArray());
-        $this->assertEquals([1,1,0], $converter->getResultArray());
+        $this->assertEquals([1, 1, 0], $converter->getResultArray());
         $this->assertEquals('110', $converter->getResult());
     }
 
@@ -125,7 +136,7 @@ class BaseConvertTest extends TestCase
 
         $this->assertIsArray($converter->getResultArray());
         $this->assertCount(5, $converter->getResultArray());
-        $this->assertEquals([0,0,1,1,0], $converter->getResultArray());
+        $this->assertEquals([0, 0, 1, 1, 0], $converter->getResultArray());
         $this->assertEquals('00110', $converter->getResult());
     }
 
@@ -135,7 +146,7 @@ class BaseConvertTest extends TestCase
 
         $this->assertIsArray($converter->getResultArray());
         $this->assertCount(3, $converter->getResultArray());
-        $this->assertEquals([2,5,5], $converter->getResultArray());
+        $this->assertEquals([2, 5, 5], $converter->getResultArray());
         $this->assertEquals('255', $converter->getResult());
     }
 
