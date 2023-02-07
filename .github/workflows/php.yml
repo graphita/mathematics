@@ -37,4 +37,7 @@ jobs:
       
     - name: Update wiki with PHP project documentation
       uses: impresscms-dev/phpdocs-wiki-update-action@v2.2.1
-
+      with:
+          engine: clean/phpdoc-md
+          class_root_namespace: Graphita\Mathematics\
+          include: Graphita\Mathematics\**
