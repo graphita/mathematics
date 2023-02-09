@@ -37,11 +37,17 @@ $result = BaseConvert::convert('FF', 16, '0123456789ABCDEF')->to(10, 'ZYXWVUTSRQ
 ```php
 use Graphita\Mathematics\Factorial;
 
-// Factrorial 3 : 3x2x1
-$result = (new Factorial(3))->calculate(); // 6
+// Factorial 3 : 3x2x1
+$result = Factorial::instance(3)->calculate()->getResult(); // 6
 
-// Factrorial 4 : 4x3x2x1
-$result = (new Factorial(4))->calculate(); // 24
+// Factorial 4 : 4x3x2x1
+$result = Factorial::instance(4)->calculate()->getResult(); // 24
+
+// Factorial 5 : 5x4x3x2x1
+$factorial = new Factorial;
+$factorial->setNumber(5);
+$factorial->calculate();
+$result = $factorial->getResult();
 ```
 
 ### Permutation
