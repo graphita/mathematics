@@ -1,6 +1,6 @@
 {
     "name": "graphita/mathematics",
-    "description": "Mathematical Library in PHP",
+    "description": "PHP Mathematics Library for easier calculation of Base Converts, Factorials, Permutation and Combination.",
     "type": "library",
     "license": "MIT",
     "autoload": {
