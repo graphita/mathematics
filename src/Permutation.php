@@ -119,16 +119,16 @@ class Permutation
         $this->possibilities = [];
         if ($this->countItems()) {
             $totalPossibilities = pow($this->countItems(), $this->getSelection());
+            $baseConverter = new BaseConvert();
+            $baseConverter->to($this->countItems())->setMinDigits($this->getSelection())->toCharacters($this->getItems());
             for ($possibilityId = 0; $possibilityId < $totalPossibilities; $possibilityId++) {
-                $itemIndexes = BaseConvert::convert($possibilityId)->to($this->countItems())->setMinDigits($this->getSelection())->calculate()->getResultArray();
-                if (!$this->canRepetitions() && count($itemIndexes) !== count(array_unique($itemIndexes))) {
-                    continue;
+                if (!$this->canRepetitions()) {
+                    $possibilityArray = $baseConverter->from($possibilityId)->calculate()->getResultArray();
+                    if( count($possibilityArray) != count(array_unique($possibilityArray)) ){
+                        continue;
+                    }
                 }
-                $possibility = [];
-                foreach ($itemIndexes as $itemIndex) {
-                    $possibility[] = $this->getItem($itemIndex);
-                }
-                $this->possibilities[] = $possibility;
+                $this->possibilities[] = $baseConverter->from($possibilityId)->calculate()->getResult();
             }
         }
         return $this;

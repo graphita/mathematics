@@ -157,10 +157,7 @@ class BaseConvert
      */
     private function getDigit(int|string $character, array $characters = []): false|int|string|null
     {
-        if (count($characters)) {
-            return array_search($character, $characters) ?? null;
-        }
-        return $character;
+        return array_search($character, $characters) ?? $character;
     }
 
     /**
@@ -170,10 +167,7 @@ class BaseConvert
      */
     private function getCharacter(int $digit, array $characters = []): mixed
     {
-        if (count($characters)) {
-            return $characters[$digit] ?? null;
-        }
-        return $digit;
+        return $characters[$digit] ?? $digit;
     }
 
     /**
@@ -227,21 +221,16 @@ class BaseConvert
         }
 
         $resultArray = [];
-        while ($sourceNumber >= $this->getDestinationBase()) {
-            $resultDigit = $sourceNumber % $this->getDestinationBase();
-            if (count($this->getDestinationCharactersMap())) {
-                $resultDigit = $this->getCharacter($resultDigit, $this->getDestinationCharactersMap());
-            }
-            $resultArray[] = $resultDigit;
-
-            $sourceNumber = floor($sourceNumber / $this->getDestinationBase());
+        $destinationBase = $this->getDestinationBase();
+        while ($sourceNumber >= $destinationBase) {
+            $resultArray[] = $this->getCharacter($sourceNumber % $destinationBase, $this->getDestinationCharactersMap());
+            $sourceNumber = floor($sourceNumber / $destinationBase);
         }
         $resultArray[] = $this->getCharacter($sourceNumber, $this->getDestinationCharactersMap());
 
-        if ($this->getMinDigits()) {
-            while (count($resultArray) < $this->getMinDigits()) {
-                $resultArray[] = $this->getCharacter(0, $this->getDestinationCharactersMap());
-            }
+        if ($this->getMinDigits() && count($resultArray) < $this->getMinDigits() ) {
+            $prefixArray = array_fill(0, $this->getMinDigits() - count($resultArray), $this->getCharacter(0, $this->getDestinationCharactersMap()));
+            $resultArray = array_merge($resultArray, $prefixArray);
         }
 
         $this->resultArray = array_reverse($resultArray);
