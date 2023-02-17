@@ -122,13 +122,13 @@ class Permutation
             $baseConverter = new BaseConvert();
             $baseConverter->to($this->countItems())->setMinDigits($this->getSelection())->toCharacters($this->getItems());
             for ($possibilityId = 0; $possibilityId < $totalPossibilities; $possibilityId++) {
+                $possibilityArray = $baseConverter->from($possibilityId)->calculate()->getResultArray();
                 if (!$this->canRepetitions()) {
-                    $possibilityArray = $baseConverter->from($possibilityId)->calculate()->getResultArray();
                     if( count($possibilityArray) != count(array_unique($possibilityArray)) ){
                         continue;
                     }
                 }
-                $this->possibilities[] = $baseConverter->from($possibilityId)->calculate()->getResult();
+                $this->possibilities[] = $possibilityArray;
             }
         }
         return $this;
