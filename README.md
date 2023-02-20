@@ -71,6 +71,15 @@ $permutation->setRepetitions(true);
 $permutation->calculate();
 $result = $permutation->getPossibilities(); // [ ['a', 'a'], ['a', 'b'], ['b','a'], ['b','b'] ]
 $count = $permutation->countPossibilities(); // 4
+
+// Permutation for huge dataset, for avoid memory leak
+$permutation = new Permutation();
+$permutation->setItems(range(1,100)); // [1, 2, 3, ..., 100]
+$permutation->setSelection(10);  
+$generator = $permutation->calculateWithoutSave();
+foreach ($generator as $possibility){ // // loop over Factorial(100) / Factorial(100 - 10)
+    print_r($possibility); // start from [1,2,3,4,5,6,7,8,9,10] to [100,99,98,97,96,95,94,93,92,91]
+}
 ```
 
 ### Combination
@@ -94,6 +103,15 @@ $combination->setRepetitions(true);
 $combination->calculate();
 $result = $combination->getPossibilities(); // [ ['a', 'a'], ['a', 'b'], ['b','b'] ]
 $count = $combination->countPossibilities(); // 3
+
+// Combination for huge dataset, for avoid memory leak
+$combination = new Combination();
+$combination->setItems(range(1,100)); // [1, 2, 3, ..., 100]
+$combination->setSelection(10);  
+$generator = $combination->calculateWithoutSave();
+foreach ($generator as $possibility){ // loop over Factorial(100) / ( Factorial(100 - 10) * Factorial(10) )
+     print_r($possibility); // start from [1,2,3,4,5,6,7,8,9,10] to [100,99,98,97,96,95,94,93,92,91]
+}
 ```
 
 ## License
