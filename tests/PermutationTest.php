@@ -99,4 +99,24 @@ class PermutationTest extends TestCase
         $this->assertCount(9, $permutation->getPossibilities());
         $this->assertEquals(9, $permutation->countPossibilities());
     }
+
+    public function testGetPossibilitiesWithoutSave()
+    {
+        $permutation = new Permutation();
+        $permutation->setItems([1, 2, 3]);
+        $permutation->setSelection(2);
+        $permutation->setRepetitions(true);
+        $generator = $permutation->calculateWithoutSave();
+
+        $this->assertInstanceOf(\Generator::class, $generator);
+
+        $count = 0;
+        foreach ($generator as $item) {
+            $this->assertIsArray($item);
+            $count++;
+        }
+
+        $this->assertEquals($count, $permutation->calculate()->countPossibilities());
+        $this->assertInstanceOf(Permutation::class, $generator->getReturn());
+    }
 }

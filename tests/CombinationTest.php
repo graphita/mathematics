@@ -99,4 +99,24 @@ class CombinationTest extends TestCase
         $this->assertCount(6, $combination->getPossibilities());
         $this->assertEquals(6, $combination->countPossibilities());
     }
+
+    public function testGetPossibilitiesWithoutSave()
+    {
+        $combination = new Combination();
+        $combination->setItems([1, 2, 3]);
+        $combination->setSelection(2);
+        $combination->setRepetitions(true);
+        $generator = $combination->calculateWithoutSave();
+
+        $this->assertInstanceOf(\Generator::class, $generator);
+
+        $count = 0;
+        foreach ($generator as $item) {
+            $this->assertIsArray($item);
+            $count++;
+        }
+
+        $this->assertEquals($count, $combination->calculate()->countPossibilities());
+        $this->assertInstanceOf(Combination::class, $generator->getReturn());
+    }
 }

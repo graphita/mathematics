@@ -2,6 +2,8 @@
 
 namespace Graphita\Mathematics;
 
+use Generator;
+
 class Permutation
 {
     /**
@@ -124,11 +126,34 @@ class Permutation
             for ($possibilityId = 0; $possibilityId < $totalPossibilities; $possibilityId++) {
                 $possibilityArray = $baseConverter->from($possibilityId)->calculate()->getResultArray();
                 if (!$this->canRepetitions()) {
-                    if( count($possibilityArray) != count(array_unique($possibilityArray)) ){
+                    if (count($possibilityArray) != count(array_unique($possibilityArray))) {
                         continue;
                     }
                 }
                 $this->possibilities[] = $possibilityArray;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Generator|$this
+     */
+    public function calculateWithoutSave(): Generator|static
+    {
+        $this->possibilities = [];
+        if ($this->countItems()) {
+            $totalPossibilities = pow($this->countItems(), $this->getSelection());
+            $baseConverter = new BaseConvert();
+            $baseConverter->to($this->countItems())->setMinDigits($this->getSelection())->toCharacters($this->getItems());
+            for ($possibilityId = 0; $possibilityId < $totalPossibilities; $possibilityId++) {
+                $possibilityArray = $baseConverter->from($possibilityId)->calculate()->getResultArray();
+                if (!$this->canRepetitions()) {
+                    if (count($possibilityArray) != count(array_unique($possibilityArray))) {
+                        continue;
+                    }
+                }
+                yield $possibilityArray;
             }
         }
         return $this;

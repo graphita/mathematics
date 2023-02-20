@@ -2,6 +2,8 @@
 
 namespace Graphita\Mathematics;
 
+use Generator;
+
 class Combination
 {
     /**
@@ -134,6 +136,30 @@ class Combination
                 if( !in_array($possibilityKey, $possibilitiesKeys) ){
                     $possibilitiesKeys[] = $possibilityKey;
                     $this->possibilities[] = $possibility;
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Generator|$this
+     */
+    public function calculateWithoutSave(): Generator|static
+    {
+        $this->possibilities = [];
+        if ($this->countItems()) {
+            $totalPossibilities = pow($this->countItems(), $this->getSelection());
+            $possibilitiesKeys = [];
+            $baseConverter = new BaseConvert();
+            $baseConverter->to($this->countItems())->setMinDigits($this->getSelection())->toCharacters($this->getItems());
+            for ($possibilityId = 0; $possibilityId < $totalPossibilities; $possibilityId++) {
+                $possibilityArray = $baseConverter->from($possibilityId)->calculate()->getResultArray();
+                sort($possibilityArray);
+                $possibilityKey = implode('-', $possibilityArray);
+                if( !in_array($possibilityKey, $possibilitiesKeys) ){
+                    $possibilitiesKeys[] = $possibilityKey;
+                    yield $possibilityArray;
                 }
             }
         }
